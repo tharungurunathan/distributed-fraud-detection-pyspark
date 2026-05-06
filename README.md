@@ -1,57 +1,43 @@
 # Distributed Fraud Detection using PySpark
 
 <p align="center">
-  <img src="Pipeline.jpeg" width="850">
+  <img src="Pipeline.jpeg" width="900">
 </p>
 
 <p align="center">
-  <b>Distributed Machine Learning Pipeline for Financial Fraud Detection on the PaySim Dataset</b>
+  <b>Distributed Machine Learning Pipeline for Financial Fraud Detection using Apache Spark</b>
 </p>
 
 <p align="center">
-  PySpark • Random Forest • Logistic Regression • Distributed SMOTE • Tomek Links • EasyEnsemble
+  PySpark • Spark MLlib • Distributed SMOTE • Tomek Links • EasyEnsemble • Random Forest
 </p>
 
 ---
 
 # Overview
 
-This project presents a **distributed fraud detection system** developed using **PySpark** for large-scale financial transaction analysis on the **PaySim dataset**.
+This project presents a distributed fraud detection pipeline developed using **PySpark** for large-scale financial transaction analysis on the **PaySim dataset**.
 
-The study investigates how different **sampling strategies** handle severe class imbalance in fraud detection tasks using distributed machine learning techniques.
+The study investigates how different sampling strategies handle severe class imbalance in fraud detection using distributed machine learning techniques.
 
-The pipeline evaluates:
+Experiments were conducted using **Databricks** and **Apache Spark** on a large-scale dataset containing over **6.36 million financial transactions**.
 
-- Baseline learning
-- Random Undersampling
-- Distributed SMOTE
-- SMOTE + Tomek Links
-- EasyEnsemble
-
-using:
+The project compares multiple imbalance-handling strategies using:
 
 - Random Forest (RF)
 - Logistic Regression (LR)
 
-on a dataset containing over **6.36 million transactions**.
+across different dataset scales and distributed processing configurations.
 
 ---
 
-# Key Features
+# Project Objectives
 
-- Distributed PySpark pipeline
-- Large-scale fraud detection
-- Distributed SMOTE implementation
-- Tomek Links boundary cleaning
-- EasyEnsemble implementation
-- Random Forest & Logistic Regression classifiers
-- Spark MLlib integration
-- Evaluation using:
-  - Precision
-  - Recall
-  - F1 Score
-  - AUC-ROC
-- Scalable distributed processing
+The project focuses on answering the following research questions:
+
+- Which sampling strategy best handles extreme class imbalance in fraud detection?
+- How do Random Forest and Logistic Regression behave under different sampling strategies?
+- Can distributed oversampling techniques scale efficiently on large datasets using Spark?
 
 ---
 
@@ -63,7 +49,25 @@ on a dataset containing over **6.36 million transactions**.
 | Total Transactions | 6.36 Million |
 | Fraud Cases | 8,213 |
 | Fraud Rate | 0.13% |
-| Class Imbalance | 769:1 |
+| Imbalance Ratio | 769:1 |
+
+The PaySim dataset simulates mobile money transactions and contains highly imbalanced fraud labels, making it suitable for evaluating distributed fraud detection systems.
+
+---
+
+# Technologies Used
+
+| Technology | Purpose |
+|---|---|
+| Python | Core Programming |
+| PySpark | Distributed Data Processing |
+| Apache Spark | Cluster Computing |
+| Spark MLlib | Machine Learning |
+| NumPy | Numerical Computation |
+| Pandas | Data Processing |
+| Jupyter Notebook | Experimentation |
+| Databricks | Distributed Execution Environment |
+| Matplotlib | Visualization |
 
 ---
 
@@ -83,30 +87,16 @@ distributed-fraud-detection-pyspark/
 
 ---
 
-# Technologies Used
-
-| Technology | Purpose |
-|---|---|
-| Python | Core Programming |
-| PySpark | Distributed Processing |
-| Spark MLlib | Machine Learning |
-| NumPy | Numerical Computation |
-| Pandas | Data Processing |
-| Jupyter Notebook | Experimentation |
-| Matplotlib | Visualization |
-
----
-
 # Distributed Pipeline Architecture
 
-The fraud detection workflow follows a distributed PySpark architecture:
+The fraud detection workflow follows a distributed Spark pipeline:
 
 1. Data Loading
 2. Feature Engineering
-3. Data Scaling
+3. Feature Scaling
 4. Sampling Strategy Application
-5. Model Training
-6. Distributed Evaluation
+5. Distributed Model Training
+6. Model Evaluation
 7. Metrics Comparison
 
 ---
@@ -128,12 +118,13 @@ Removed Features:
 - `nameOrig`
 - `nameDest`
 
-Reason:
-Identifier columns do not provide predictive value and introduce unnecessary noise.
+Identifier columns were removed because they do not provide meaningful predictive information and may introduce noise into the learning process.
 
 ---
 
 # Sampling Strategies
+
+The project evaluates five sampling approaches:
 
 | Strategy | Description |
 |---|---|
@@ -145,22 +136,23 @@ Identifier columns do not provide predictive value and introduce unnecessary noi
 
 ---
 
-# Distributed SMOTE
+# Distributed SMOTE Implementation
 
-This project implements a custom distributed version of SMOTE using PySpark.
+A custom distributed implementation of SMOTE was developed using PySpark.
 
-## Process
+## Workflow
 
-- Minority fraud samples collected from partitions
-- Broadcast variables used for worker distribution
+- Minority fraud samples collected from Spark partitions
+- Broadcast variables distribute minority samples across workers
 - KNN-based interpolation generates synthetic fraud samples
-- Fully distributed processing using Spark workers
+- Synthetic samples merged using distributed Spark operations
 
-## Advantages
+## Key Advantages
 
 - Reduces driver bottlenecks
+- Minimizes expensive shuffle operations
 - Scales efficiently on large datasets
-- Avoids heavy shuffle operations
+- Fully integrated into distributed Spark processing
 
 ---
 
@@ -177,9 +169,9 @@ seed = 42
 ```
 
 Advantages:
-- Handles non-linear decision boundaries
+- Handles non-linear fraud patterns
 - Robust against noisy synthetic samples
-- Best overall performance
+- Best overall performance across experiments
 
 ---
 
@@ -194,25 +186,30 @@ regParam = 0.01
 
 Advantages:
 - Fast distributed training
-- Lightweight baseline classifier
+- Lightweight baseline model
+- Useful for comparison against ensemble methods
 
 ---
 
-# Experimental Results
+# Experimental Evaluation
 
-## Best Performing Strategy
+Models were evaluated using:
 
-| Model | Strategy | F1 Score | AUC-ROC |
-|---|---|---|---|
-| Random Forest | Distributed SMOTE | 0.833 | 0.986 |
+- Precision
+- Recall
+- F1 Score
+- AUC-ROC
+- Training Time
+
+Experiments were conducted across multiple dataset scales to evaluate both performance and scalability.
 
 ---
 
 # Full Results (100% Dataset Scale)
 
-## Random Forest
+## Random Forest Results
 
-| Strategy | Recall | Precision | F1 Score | AUC | Time (s) |
+| Strategy | Recall | Precision | F1 Score | AUC-ROC | Time (s) |
 |---|---|---|---|---|---|
 | Baseline | 0.640 | 0.991 | 0.778 | 0.962 | 93 |
 | Undersampling | 0.977 | 0.028 | 0.054 | 0.996 | 50 |
@@ -226,21 +223,21 @@ Advantages:
 
 - Distributed SMOTE achieved the best balance between Recall and Precision.
 - Random Forest consistently outperformed Logistic Regression.
-- SMOTE + Tomek Links improved boundary cleaning but increased runtime significantly.
-- EasyEnsemble achieved extremely high Recall but poor Precision.
-- F1 Score proved to be the most important evaluation metric for fraud detection.
+- SMOTE + Tomek Links improved boundary cleaning but significantly increased runtime.
+- EasyEnsemble achieved very high Recall but extremely poor Precision.
+- F1 Score proved to be the most reliable metric for fraud detection evaluation.
 
 ---
 
 # Scalability
 
-The pipeline was evaluated across:
+The pipeline was evaluated using different dataset scales:
 
 - 10% dataset scale
 - 30% dataset scale
 - 100% dataset scale
 
-Results show efficient distributed scaling using Spark with manageable training times.
+Results demonstrate that distributed Spark processing enables scalable experimentation on highly imbalanced big data workloads.
 
 ---
 
@@ -254,7 +251,7 @@ git clone https://github.com/tharungurunathan/distributed-fraud-detection-pyspar
 
 ---
 
-## 2. Install Requirements
+## 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -291,23 +288,33 @@ jupyter
 
 # Future Improvements
 
-- XGBoost / Gradient Boosting
-- Spark Structured Streaming
-- Real-time fraud scoring
-- Hyperparameter tuning
-- Graph-based fraud ring detection
-- Cost-sensitive learning
+Potential future enhancements include:
+
+- Hyperparameter optimization
+- Gradient Boosting / XGBoost integration
+- Real-time fraud detection with Spark Streaming
+- Graph-based fraud ring analysis
+- Cost-sensitive learning techniques
+- Advanced distributed ensemble methods
 
 ---
 
-# Research Contributions
+# Research Contribution
 
 This project demonstrates:
 
-- Distributed handling of imbalanced big data
-- Efficient Spark-based oversampling
-- Large-scale fraud detection architecture
-- Comparative evaluation of sampling strategies
+- Distributed handling of imbalanced financial datasets
+- Scalable oversampling using Spark
+- Comparative evaluation of sampling techniques
+- Large-scale fraud detection using distributed machine learning
+
+---
+
+# Academic Context
+
+This project was developed as part of a group research study focused on big data learning and distributed machine learning techniques.
+
+The presentation and implementation contributions were individually prepared and evaluated.
 
 ---
 
@@ -315,8 +322,8 @@ This project demonstrates:
 
 ## Tharun Gurunathan
 
-University of Nottingham  
-School of Computer Science
+School of Computer Science  
+University of Nottingham
 
 GitHub:
 https://github.com/tharungurunathan
@@ -325,4 +332,4 @@ https://github.com/tharungurunathan
 
 # License
 
-This project is developed for academic and research purposes.
+This project is intended for academic, research, and educational purposes.
