@@ -1,0 +1,7 @@
+pyspark
+numpy
+pandas
+scikit-learn
+matplotlib
+jupyter
+python-pptx
